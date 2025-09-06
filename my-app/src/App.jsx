@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-// Assuming these are your page components
-// They no longer need a 'setPage' prop
-import HomePage from './homepage';
-import LoginPage from './Login';
-import SignupPage from './Signup';
-import DashboardPage from './DashBoard';
+// --- Page Components ---
+// These are imported from your project files.
+import DashboardPage from './DashBoard.jsx';
+import ProjectPage from './ProjectPage.jsx';
+import TaskFormPage from './TaskFormPage.jsx';
+import NewProjectPage from './NewProjectPage.jsx';
+
+// Mock components for routes that haven't been created yet.
+const LoginPage = () => <div className="p-4">Login Page</div>;
+const SignupPage = () => <div className="p-4">Signup Page</div>;
+
 
 export default function App() {
-  // Theme state is now a global concern, managed at the top level
+  // Global theme state management
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
+  // Function to toggle between light and dark themes
   const toggleTheme = () => {
     setTheme(prevTheme => {
       const newTheme = prevTheme === 'light' ? 'dark' : 'light';
@@ -20,7 +26,8 @@ export default function App() {
     });
   };
     
-  // Effect to apply the 'dark' class to the <html> element
+  // This effect applies the 'dark' class to the main <html> element
+  // when the theme state changes, enabling Tailwind's dark mode.
   useEffect(() => {
     const root = window.document.documentElement;
     if (theme === 'dark') {
@@ -34,24 +41,43 @@ export default function App() {
     <div className="font-sans antialiased">
       <BrowserRouter>
         <Routes>
+          {/* --- Redirect from root to dashboard --- */}
           <Route 
             path="/" 
-            element={<HomePage theme={theme} toggleTheme={toggleTheme} />} 
+            element={<Navigate to="/dashboard" />} 
           />
+
+          {/* Authentication Pages */}
           <Route 
             path="/login" 
-            element={<LoginPage theme={theme} toggleTheme={toggleTheme} />} 
+            element={<LoginPage />} 
           />
           <Route 
             path="/signup" 
-            element={<SignupPage theme={theme} toggleTheme={toggleTheme} />} 
+            element={<SignupPage />} 
           />
+
+          {/* Main Application Pages */}
           <Route 
             path="/dashboard" 
             element={<DashboardPage theme={theme} toggleTheme={toggleTheme} />} 
+          />
+          <Route 
+            path="/dashboard/new-project" 
+            element={<NewProjectPage theme={theme} toggleTheme={toggleTheme} />} 
+          />
+          <Route 
+            path="/projects/:projectId" 
+            element={<ProjectPage theme={theme} toggleTheme={toggleTheme} />} 
+          />
+          <Route 
+            path="/projects/:projectId/new-task" 
+            element={<TaskFormPage theme={theme} toggleTheme={toggleTheme} />} 
           />
         </Routes>
       </BrowserRouter>
     </div>
   );
 }
+
+
