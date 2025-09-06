@@ -107,7 +107,7 @@ export default function SignupPage() {
                     last_name: lastName,
                     email: email,
                     password: password,
-                    password2: password,
+                    password2: confirmPassword, // Make sure to send confirm password to Django if needed
                 }),
             });
 
@@ -115,6 +115,8 @@ export default function SignupPage() {
 
             if (response.ok) {
                 console.log("Signup successful:", data);
+                // Correct place to store user data in localStorage
+                localStorage.setItem('userData', JSON.stringify(data));
                 navigate('/dashboard');
             } else {
                 console.error("Signup failed:", data);
