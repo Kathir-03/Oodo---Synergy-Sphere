@@ -1,11 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import getCookie from '../utils'; // Import the helper function
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
+    const baseURL = 'http://127.0.0.1:8000/';
+
+  useEffect(() => {
+    // This function will be called when the component mounts
+    const getCsrfToken = async () => {
+      try {
+        // We still need to hit the endpoint to get the cookie set
+        await fetch(`${baseURL}/api/auth/csrf/`);
+        console.log("CSRF cookie should be set now.");
+      } catch (error) {
+        console.error("Error fetching CSRF token:", error);
+      }
+    };
+
+    getCsrfToken();
+  }, []);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    // 1. Get the CSRF token value using our helper function
+    const csrfToken = getCookie('csrftoken');
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/auth/register/`, {
+        method: 'POST',
+        // 2. IMPORTANT: Include credentials to send cookies
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          // 3. Manually set the X-CSRFToken header
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          username: 'testuser', // Replace with form data
+          password: 'testpassword', // Replace with form data
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Login successful:", data);
+      } else {
+        console.error("Login failed:", data);
+      }
+    } catch (error) {
+      console.error("An error occurred during login:", error);
+    }
+  };
 
     const validate = () => {
         const newErrors = {};
@@ -68,7 +117,7 @@ export default function LoginPage() {
                             />
                             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                         </div>
-                        <button type="submit" className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors duration-300">
+                        <button type="submit" onClick={handleLogin} className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors duration-300">
                             Login to Dashboard
                         </button>
                     </form>
