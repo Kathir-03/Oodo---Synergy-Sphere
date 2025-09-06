@@ -117,7 +117,7 @@ class PasswordResetConfirmAPIView(APIView):
 
 #project creation
 class ProjectListCreateAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         projects = Project.objects.all()
