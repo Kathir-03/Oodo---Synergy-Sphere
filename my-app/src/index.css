@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+/* Universal fix for both themes */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    transition: background-color 99999s ease-in-out 0s;
+}
+
+/* Specific styling for autofilled dark theme inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #E0E0E0 !important;
+    background-color: #1E1E1E !important;
+}
+
+/* Specific styling for autofilled light theme inputs */
+.light-theme input:-webkit-autofill,
+.light-theme input:-webkit-autofill:hover,
+.light-theme input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #212529 !important;
+    background-color: #FFFFFF !important;
+}
