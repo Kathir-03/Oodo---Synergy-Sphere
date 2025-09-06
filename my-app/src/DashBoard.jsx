@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 // --- Icon Components (inline SVGs) ---
@@ -29,36 +29,39 @@ const mockDashboardProjects = [
 ];
 
 // --- UI Components ---
-const Sidebar = ({ theme, toggleTheme }) => (
-    <div className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
-            <span className="font-bold text-2xl text-indigo-600 dark:text-indigo-400">SynergySphere</span>
-        </div>
-        <div className="flex flex-col flex-grow p-4 space-y-2">
-            <nav className="flex-grow">
-                <Link to="/dashboard" className="flex items-center px-4 py-2 text-lg font-semibold text-white bg-indigo-600 rounded-lg">Projects</Link>
-                <Link to="#" className="flex items-center px-4 py-2 mt-2 text-lg font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">My Tasks</Link>
-            </nav>
-            <div className="space-y-4">
-                <div className="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</span>
-                    <div className="flex items-center p-1 bg-white dark:bg-gray-800 rounded-full">
-                        <button onClick={toggleTheme} className={`p-1.5 rounded-full ${theme === 'light' ? 'bg-indigo-600 text-white' : 'text-gray-500'}`}><Icon name="sun" size={16} /></button>
-                        <button onClick={toggleTheme} className={`p-1.5 rounded-full ${theme === 'dark' ? 'bg-indigo-600 text-white' : 'text-gray-500'}`}><Icon name="moon" size={16} /></button>
+const Sidebar = ({ theme, toggleTheme, userName, userEmail }) => {
+    const navigate = useNavigate();
+    return (
+        <div className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
+                <span className="font-bold text-2xl text-indigo-600 dark:text-indigo-400">SynergySphere</span>
+            </div>
+            <div className="flex flex-col flex-grow p-4 space-y-2">
+                <nav className="flex-grow">
+                    <Link to="/dashboard" className="flex items-center px-4 py-2 text-lg font-semibold text-white bg-indigo-600 rounded-lg">Projects</Link>
+                    <Link to="#" className="flex items-center px-4 py-2 mt-2 text-lg font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">My Tasks</Link>
+                </nav>
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</span>
+                        <div className="flex items-center p-1 bg-white dark:bg-gray-800 rounded-full">
+                            <button onClick={toggleTheme} className={`p-1.5 rounded-full ${theme === 'light' ? 'bg-indigo-600 text-white' : 'text-gray-500'}`}><Icon name="sun" size={16} /></button>
+                            <button onClick={toggleTheme} className={`p-1.5 rounded-full ${theme === 'dark' ? 'bg-indigo-600 text-white' : 'text-gray-500'}`}><Icon name="moon" size={16} /></button>
+                        </div>
                     </div>
-                </div>
-                <div className="flex items-center space-x-3 p-2 border-t border-gray-200 dark:border-gray-700 pt-4">
-                    <div className="w-10 h-10 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-700 font-bold">TU</div>
-                    <div>
-                        <p className="font-semibold text-sm text-gray-800 dark:text-white">Test User</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">user@email.com</p>
+                    <div className="flex items-center space-x-3 p-2 border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <div className="w-10 h-10 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-700 font-bold">TU</div>
+                        <div>
+                            <p className="font-semibold text-sm text-gray-800 dark:text-white">{userName}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{userEmail}</p>
+                        </div>
+                        <button className="ml-auto text-gray-500 dark:text-gray-400"><Icon name="moreHorizontal" /></button>
                     </div>
-                    <button className="ml-auto text-gray-500 dark:text-gray-400"><Icon name="moreHorizontal" /></button>
                 </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 const Header = () => (
     <header className="flex-shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
@@ -70,7 +73,7 @@ const Header = () => (
                     <input type="text" placeholder="Search..." className="pl-10 pr-4 py-2 w-48 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
                 </div>
                 <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"><Icon name="bell" size={20} /></button>
-                <a href="/dashboard/new-project"><button  className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors"><Icon name="plus" size={16} /><span>New Project</span></button></a>
+                <a href="/dashboard/new-project"><button className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors"><Icon name="plus" size={16} /><span>New Project</span></button></a>
             </div>
         </div>
     </header>
@@ -88,21 +91,42 @@ const ProjectCard = ({ project }) => (
 );
 
 export default function DashboardPage({ theme, toggleTheme }) {
-  return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-        <Sidebar theme={theme} toggleTheme={toggleTheme} />
-        <div className="flex flex-col flex-1 overflow-hidden">
-            <Header />
-            <main className="flex-1 overflow-y-auto p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {mockDashboardProjects.map(project => (
-                        <Link to={`/projects/${project.id}`} key={project.id}>
-                            <ProjectCard project={project} />
-                        </Link>
-                    ))}
-                </div>
-            </main>
+    const navigate = useNavigate();
+    const [name, setName] = useState('Test User');
+    const [mail, setMail] = useState('user@gmail.com');
+
+    useEffect(() => {
+        try {
+            const userDataString = localStorage.getItem('userData');
+            if (userDataString) {
+                const userData = JSON.parse(userDataString);
+                // Correctly set state with parsed data
+                setName(`${userData.first_name || 'Test'} ${userData.last_name || 'User'}`);
+                setMail(userData.email || 'user@email.com');
+            }
+        } catch (error) {
+            console.error("Failed to parse user data from localStorage", error);
+            localStorage.removeItem('userData');
+            // Redirect to login if data is invalid or missing
+            navigate('/login');
+        }
+    }, [navigate]);
+
+    return (
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+            <Sidebar theme={theme} toggleTheme={toggleTheme} userName={name} userEmail={mail} />
+            <div className="flex flex-col flex-1 overflow-hidden">
+                <Header />
+                <main className="flex-1 overflow-y-auto p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {mockDashboardProjects.map(project => (
+                            <Link to={`/projects/${project.id}`} key={project.id}>
+                                <ProjectCard project={project} />
+                            </Link>
+                        ))}
+                    </div>
+                </main>
+            </div>
         </div>
-    </div>
-  );
+    );
 }
