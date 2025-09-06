@@ -1,127 +1,87 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// src/pages/LoginPage.js
+import React, { useState } from 'react';
 
-export default function Login() {
-  const [theme, setTheme] = useState('dark');
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+export default function LoginPage({ setPage }) {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState({});
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
+    const validate = () => {
+        const newErrors = {};
+        if (!email) newErrors.email = 'Email is required';
+        else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Email is invalid';
+        if (!password) newErrors.password = 'Password is required';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (validate()) {
+            // In a real app, you'd perform an API call here.
+            // On success, navigate to the dashboard.
+            setPage('dashboard');
+        }
+    };
 
-    if (email === "test@example.com" && password === "123456") {
-      console.log("Login successful!");
-      navigate("/dashboard");
-    } else {
-      alert("Invalid credentials");
-    }
-  };
-
-  const colors = {
-    dark: {
-      bg: '#121212',
-      card: '#1E1E1E',
-      textPrimary: '#E0E0E0',
-      textSecondary: '#B3B3B3',
-      inputBg: '#121212',
-      inputBorder: '#424242',
-      accent: '#A948C9',
-      disabledBg: '#333333',
-      disabledText: '#B3B3B3',
-    },
-    light: {
-      bg: '#F8F9FA',
-      card: '#FFFFFF',
-      textPrimary: '#212529',
-      textSecondary: '#6C757D',
-      inputBg: '#F8F9FA',
-      inputBorder: '#DEE2E6',
-      accent: '#A948C9',
-      disabledBg: '#E9ECEF',
-      disabledText: '#6C757D',
-    }
-  };
-
-  const currentColors = colors[theme];
-
-  return (
-    <div className={`flex items-center justify-center min-h-screen transition-colors duration-300`} style={{ backgroundColor: currentColors.bg }}>
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={toggleTheme}
-          className={`p-2 rounded-full transition-colors duration-300 ${
-            theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          {theme === 'dark' ? '☀️' : '🌙'}
-        </button>
-      </div>
-
-      <div className={`p-8 rounded-lg shadow-lg w-full max-w-md transition-colors duration-300`} style={{ backgroundColor: currentColors.card, color: currentColors.textPrimary }}>
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Login into account
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: currentColors.textSecondary }}>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg p-2 outline-none focus:ring focus:ring-2"
-              style={{
-                backgroundColor: currentColors.inputBg,
-                borderColor: currentColors.inputBorder,
-                color: currentColors.textPrimary,
-                borderWidth: '1px', // Tailwind border property isn't dynamic, so we use inline style
-                '--tw-ring-color': currentColors.accent
-              }}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: currentColors.textSecondary }}>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg p-2 outline-none focus:ring focus:ring-2"
-              style={{
-                backgroundColor: currentColors.inputBg,
-                borderColor: currentColors.inputBorder,
-                color: currentColors.textPrimary,
-                borderWidth: '1px',
-                '--tw-ring-color': currentColors.accent
-              }}
-              required
-            />
-          </div>
-
-          <div className="text-right">
-            <a href="#" className="text-sm hover:underline" style={{ color: currentColors.accent }}>
-              Forget password?
-            </a>
-          </div>
-
-          <button
-            type="submit"
-            className={`w-full font-semibold py-2 rounded-2xl transition-colors duration-300`}
-            style={{
-              backgroundColor: currentColors.accent,
-              color: 'white'
-            }}
-          >
-            Login
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center items-center p-4 transition-colors duration-300">
+            <div className="max-w-md w-full mx-auto">
+                <div 
+                    className="text-3xl font-bold text-center text-indigo-600 cursor-pointer"
+                    onClick={() => setPage('home')}
+                >
+                    SynergySphere
+                </div>
+                <div className="bg-white dark:bg-gray-800 p-8 mt-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                    <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100 mb-1">
+                        Welcome Back!
+                    </h2>
+                    <p className="text-sm text-center text-gray-500 dark:text-gray-400 mb-6">
+                        Sign in to continue
+                    </p>
+                    <form onSubmit={handleSubmit} noValidate>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="email">
+                                Email Address
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className={`w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'}`}
+                            />
+                            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                        </div>
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="password">
+                                Password
+                            </label>
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className={`w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-indigo-500'}`}
+                            />
+                            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                        </div>
+                        <button type="submit" className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors duration-300">
+                            Login to Dashboard
+                        </button>
+                    </form>
+                    <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
+                        Don't have an account?{" "}
+                        <span
+                            onClick={() => setPage('signup')}
+                            className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+                        >
+                            Sign Up
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
