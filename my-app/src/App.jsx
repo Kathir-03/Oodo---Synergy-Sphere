@@ -1,58 +1,57 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Assuming these are your page components
+// They no longer need a 'setPage' prop
 import HomePage from './homepage';
-import LoginPage from './Login'; // <-- Updated import
-import SignupPage from './Signup'; // <-- Updated import
+import LoginPage from './Login';
+import SignupPage from './Signup';
 import DashboardPage from './dashboard';
 
 export default function App() {
-    // This state now acts as our "router"
-    const [page, setPage] = useState('home'); // 'home', 'login', 'signup', 'dashboard'
+  // Theme state is now a global concern, managed at the top level
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => {
+      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme', newTheme);
+      return newTheme;
+    });
+  };
     
-    // Theme state is kept here as it's a global concern
-    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  // Effect to apply the 'dark' class to the <html> element
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
 
-    const toggleTheme = () => {
-        setTheme(prevTheme => {
-            const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-            localStorage.setItem('theme', newTheme);
-            return newTheme;
-        });
-    };
-    
-    // Effect to apply the 'dark' class to the <html> element
-    useEffect(() => {
-        const root = window.document.documentElement;
-        if (theme === 'dark') {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
-        }
-    }, [theme]);
-
-    // Effect to scroll to the top of the page on page change
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [page]);
-
-    // This function decides which page component to render
-    const renderPage = () => {
-        switch (page) {
-            case 'login':
-                return <LoginPage setPage={setPage} />; // <-- Updated component
-            case 'signup':
-                return <SignupPage setPage={setPage} />; // <-- Updated component
-            case 'dashboard':
-                return <DashboardPage theme={theme} toggleTheme={toggleTheme} setPage={setPage} />;
-            case 'home':
-            default:
-                return <HomePage setPage={setPage} theme={theme} toggleTheme={toggleTheme} />;
-        }
-    };
-
-    return (
-        <div className="font-sans antialiased">
-            {renderPage()}
-        </div>
-    );
+  return (
+    <div className="font-sans antialiased">
+      <BrowserRouter>
+        <Routes>
+          <Route 
+            path="/" 
+            element={<HomePage theme={theme} toggleTheme={toggleTheme} />} 
+          />
+          <Route 
+            path="/login" 
+            element={<LoginPage theme={theme} toggleTheme={toggleTheme} />} 
+          />
+          <Route 
+            path="/signup" 
+            element={<SignupPage theme={theme} toggleTheme={toggleTheme} />} 
+          />
+          <Route 
+            path="/dashboard" 
+            element={<DashboardPage theme={theme} toggleTheme={toggleTheme} />} 
+          />
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
 }

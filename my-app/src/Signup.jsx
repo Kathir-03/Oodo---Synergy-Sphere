@@ -1,11 +1,12 @@
-// src/pages/SignupPage.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function SignupPage({ setPage }) {
+export default function SignupPage() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     const validate = () => {
         const newErrors = {};
@@ -21,8 +22,8 @@ export default function SignupPage({ setPage }) {
         e.preventDefault();
         if (validate()) {
             // In a real app, you'd perform an API call here.
-            // On success, you might also log them in and redirect to the dashboard.
-            setPage('dashboard');
+            // On success, navigate to the dashboard.
+            navigate('/dashboard');
         }
     };
 
@@ -31,7 +32,7 @@ export default function SignupPage({ setPage }) {
             <div className="max-w-md w-full mx-auto">
                 <div
                     className="text-3xl font-bold text-center text-indigo-600 cursor-pointer"
-                    onClick={() => setPage('home')}
+                    onClick={() => navigate('/')}
                 >
                     SynergySphere
                 </div>
@@ -89,7 +90,7 @@ export default function SignupPage({ setPage }) {
                     <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
                         Already have an account?{" "}
                         <span
-                            onClick={() => setPage('login')}
+                            onClick={() => navigate('/login')}
                             className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
                         >
                             Login
