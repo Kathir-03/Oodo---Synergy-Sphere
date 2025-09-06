@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './homepage';
 import LoginPage from './Login';
 import SignupPage from './Signup';
-import DashboardPage from './dashboard';
+import DashboardPage from './DashBoard';
 
 export default function App() {
   // Theme state is now a global concern, managed at the top level
