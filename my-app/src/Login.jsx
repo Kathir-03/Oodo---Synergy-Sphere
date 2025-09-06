@@ -1,24 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [theme, setTheme] = useState('dark');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  // Helper function to get the CSRF token from the cookie
+  const getCookie = (name) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  };
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
 
-    if (email === "test@example.com" && password === "123456") {
-      console.log("Login successful!");
+    const csrftoken = getCookie('csrftoken');
+
+    try {
+      const response = await fetch('your-django-api-endpoint/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        // Handle non-200 responses
+        const errorData = await response.json();
+        setError(errorData.error || "Invalid credentials. Please try again.");
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Login successful!", data);
       navigate("/dashboard");
-    } else {
-      alert("Invalid credentials");
+
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError("An unexpected error occurred. Please try again later.");
     }
   };
 
@@ -79,7 +119,7 @@ export default function Login() {
                 backgroundColor: currentColors.inputBg,
                 borderColor: currentColors.inputBorder,
                 color: currentColors.textPrimary,
-                borderWidth: '1px', // Tailwind border property isn't dynamic, so we use inline style
+                borderWidth: '1px',
                 '--tw-ring-color': currentColors.accent
               }}
               required
@@ -109,6 +149,10 @@ export default function Login() {
               Forget password?
             </a>
           </div>
+
+          {error && (
+            <div className="text-red-500 text-sm mt-4 text-center">{error}</div>
+          )}
 
           <button
             type="submit"
