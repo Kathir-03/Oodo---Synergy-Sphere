@@ -8,8 +8,9 @@ from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, UserSerializer
 from django.contrib.auth.tokens import default_token_generator
 
-from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
-
+from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer,TaskSerializer,ProjectCreateSerializer,ProjectMemberSerializer,ProjectSerializer,TaskCreateSerializer
+from .models import Task,Project,ProjectMember
+#csrf
 class CsrfTokenView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -17,6 +18,7 @@ class CsrfTokenView(APIView):
     def get(self, request):
         return Response({"detail": "CSRF cookie set"})
 
+#register
 
 class RegisterAPIView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -28,7 +30,7 @@ class RegisterAPIView(APIView):
             return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+#login
 class LoginAPIView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -51,7 +53,7 @@ class LoginAPIView(APIView):
             })
         return Response({"detail": "Invalid email or password"}, status=400)
 
-
+#logout
 class LogoutAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -59,12 +61,15 @@ class LogoutAPIView(APIView):
         logout(request)
         return Response({"detail": "Logged out"}, status=status.HTTP_200_OK)
 
+#user details
 
 class CurrentUserAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         return Response(UserSerializer(request.user).data)
+    
+#password reset
     
 class PasswordResetRequestAPIView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -109,3 +114,42 @@ class PasswordResetConfirmAPIView(APIView):
         user.save()
 
         return Response({"detail": "Password reset successfully"})
+
+#project creation
+class ProjectListCreateAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        projects = Project.objects.all()
+        serializer = ProjectSerializer(projects, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ProjectCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            project = serializer.save()
+            return Response(ProjectSerializer(project).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TaskCreateAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        """
+        Get all tasks of a project (project_id passed in query params or body)
+        """
+        project_id = request.query_params.get("project_id") or request.data.get("project_id")
+        if not project_id:
+            return Response({"detail": "project_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        tasks = Task.objects.filter(project_id=project_id)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    def post(self, request):
+        data = request.data
+        serializer = TaskCreateSerializer(data=data)
+        if serializer.is_valid():
+            task = serializer.save()
+            return Response(TaskCreateSerializer(task).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

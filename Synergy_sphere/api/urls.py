@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     CsrfTokenView, RegisterAPIView, LoginAPIView, LogoutAPIView, CurrentUserAPIView,
-    PasswordResetConfirmAPIView,PasswordResetRequestAPIView
+    PasswordResetConfirmAPIView,PasswordResetRequestAPIView,ProjectListCreateAPIView,TaskCreateAPIView
 )
 
 urlpatterns = [
@@ -12,4 +12,7 @@ urlpatterns = [
     path("auth/user/", CurrentUserAPIView.as_view(), name="auth-user"),
     path("auth/password-reset/", PasswordResetRequestAPIView.as_view(), name="password-reset"),
     path("auth/password-reset-confirm/", PasswordResetConfirmAPIView.as_view(), name="password-reset-confirm"),
+    #project
+    path("projects/", ProjectListCreateAPIView.as_view(), name="project-list-create"),
+    path("projects/tasks/", TaskCreateAPIView.as_view(), name="task-create"),
 ]
