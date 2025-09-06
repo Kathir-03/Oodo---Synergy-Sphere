@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import React, { useState , useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Menu, Sun, Moon, Bell, Search, Settings, MoreHorizontal, Plus, Briefcase, List, UserCircle, CheckSquare, Paperclip } from 'lucide-react';
 
-
-const projects = [
-        { title: "RD Services", date: "21/08/23", tasks: 0, files: 10, tags: [{name: 'Services', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'}, {name: 'In-progress', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'}] },
-        { title: "HD Upgrade", date: "15/07/23", tasks: 5, files: 2, tags: [{name: 'On Hold', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}]},
-        { title: "Server Migration", date: "01/09/23", tasks: 22, files: 48, tags: [{name: 'Migration', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'}, {name: 'In-progress', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'}]}
-    ];
-    
-// Reusable Button Component
+// Reusable Button Component,111111111111
 const PrimaryButton = ({ children, onClick, className = '' }) => (
     <button
         onClick={onClick}
@@ -32,7 +25,7 @@ const ThemeToggle = ({ theme, toggleTheme }) => (
 
 // --- Navbar Component ---
 const Navbar = ({ toggleSidebar, theme, toggleTheme }) => {
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
     const [showNotifications, setShowNotifications] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -47,7 +40,7 @@ const Navbar = ({ toggleSidebar, theme, toggleTheme }) => {
                         <Menu size={24} />
                     </button>
                     <span 
-                        onClick={() => navigate('/')} // Navigate to homepage
+                        onClick={() => navigate('/')}
                         className="font-bold text-xl text-indigo-600 dark:text-indigo-400 ml-3 md:ml-0 cursor-pointer"
                     >
                         Company
@@ -57,7 +50,7 @@ const Navbar = ({ toggleSidebar, theme, toggleTheme }) => {
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Search..."
+                            placeholder="Search projects..."
                             className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         />
                         <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -109,11 +102,11 @@ const Navbar = ({ toggleSidebar, theme, toggleTheme }) => {
 };
 
 // --- Sidebar Component ---
-const Sidebar = ({ isCollapsed, onToggle, theme, toggleTheme }) => {
+const Sidebar = ({ isCollapsed, onToggle, theme, toggleTheme, userData }) => {
     const navigate = useNavigate();
     const sidebarWidth = isCollapsed ? 'w-20' : 'w-64';
     const collapsedClass = isCollapsed ? '' : 'items-center justify-center';
-
+   
     return (
         <>
             {isCollapsed && (
@@ -161,14 +154,39 @@ const Sidebar = ({ isCollapsed, onToggle, theme, toggleTheme }) => {
                     </div>
                     
                     <button
-                        onClick={() => navigate('/login')}
+                        onClick={async () => {
+                            localStorage.removeItem('userData');
+                            try{
+                                await fetch(`http://127.0.0.1:8000/api/auth/logout/`, {
+                                    method: 'POST',
+                                    credentials: 'include',
+                                });
+                            }catch(err){console.error(err)}
+                            navigate('/login');
+                        }}
                         className="flex items-center space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700 w-full"
                     >
                         <UserCircle className="w-10 h-10 text-indigo-600 dark:text-indigo-400" />
-                        {!isCollapsed && <div><p className="font-semibold text-gray-800 dark:text-gray-100">First User</p><p className="text-xs text-gray-500 dark:text-gray-400">user@email</p></div>}
+                        {!isCollapsed && userData && (
+                            <div>
+                                <p className="font-semibold text-gray-800 dark:text-gray-100">
+                                    {userData.first_name} {userData.last_name}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">{userData.email}</p>
+                            </div>
+                        )}
                     </button>
                     <button
-                        onClick={() => navigate('/login')}
+                        onClick={async () => {
+                            localStorage.removeItem('userData');
+                            try{
+                                await fetch(`http://127.0.0.1:8000/api/auth/logout/`, {
+                                    method: 'POST',
+                                    credentials: 'include',
+                                });
+                            }catch(err){console.error(err)}
+                            navigate('/login');
+                        }}
                         className="w-full text-center text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
                     >
                         Log Out
@@ -201,10 +219,8 @@ const ProjectCard = ({ project }) => (
 );
 
 // --- Projects View Component ---
-const ProjectsView = ({ sidebarOpen, theme, toggleTheme }) => {
-    
-
-    const mainContentMargin = sidebarOpen ? 'md:ml-20' : 'md:ml-64';
+const ProjectsView = ({ isSidebarCollapsed, projects }) => {
+    const mainContentMargin = isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64';
 
     return (
         <div className={`flex-grow p-6 transition-all duration-300 ${mainContentMargin} pt-20 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200`}>
@@ -216,8 +232,12 @@ const ProjectsView = ({ sidebarOpen, theme, toggleTheme }) => {
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-               {projects.map(p => <ProjectCard key={p.title} project={p} />)}
-            </div>
+                       {projects.length > 0 ? (
+                           projects.map(p => <ProjectCard key={p.title} project={p} />)
+                       ) : (
+                           <p>No projects found.</p>
+                       )}
+                   </div>
         </div>
     );
 };
@@ -225,13 +245,68 @@ const ProjectsView = ({ sidebarOpen, theme, toggleTheme }) => {
 
 // --- Main DashboardPage Component ---
 export default function DashboardPage({ theme, toggleTheme }) {
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [userData, setUserData] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const baseURL = 'http://127.0.0.1:8000';
+
+    useEffect(() => {
+        try {
+            const storedUserData = localStorage.getItem('userData');
+            if (storedUserData) {
+                setUserData(JSON.parse(storedUserData));
+            } else {
+                navigate('/login');
+            }
+        } catch (error) {
+            console.error("Failed to parse user data from localStorage", error);
+            localStorage.removeItem('userData');
+            navigate('/login');
+        }
+    }, [navigate]);
+
+    // Fetch projects data
+    useEffect(() => {
+        const fetchProjects = async () => {
+            if (!userData) return;
+            
+            try {
+                const response = await fetch(`${baseURL}/api/projects/`, {
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setProjects(data);
+                } else {
+                    console.error("Failed to fetch projects:", response.statusText);
+                }
+            } catch (error) {
+                console.error("An error occurred while fetching projects:", error);
+            }
+        };
+
+        fetchProjects();
+    }, [userData]); // Re-fetch projects if userData changes
+
+    if (!userData) {
+        return <div>Loading...</div>; // Or a loading spinner
+    }
 
     return (
         <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 overflow-hidden">
-            <Sidebar isCollapsed={isSidebarCollapsed} onToggle={() => setSidebarCollapsed(!isSidebarCollapsed)} theme={theme} toggleTheme={toggleTheme} />
+            <Sidebar 
+                isCollapsed={isSidebarCollapsed} 
+                onToggle={() => setSidebarCollapsed(!isSidebarCollapsed)} 
+                theme={theme} 
+                toggleTheme={toggleTheme} 
+                userData={userData} 
+            />
             <main className="flex-1 flex flex-col overflow-y-auto">
                 <header className="flex items-center justify-between p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
                     <div className="text-sm font-semibold"><span className="text-indigo-500">&gt;</span> Projects</div>
@@ -248,18 +323,7 @@ export default function DashboardPage({ theme, toggleTheme }) {
                         </button>
                     </div>
                 </header>
-                <div className="p-6 flex-grow">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Projects</h2>
-                        <div className="flex items-center space-x-3">
-                            <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"><MoreHorizontal className="w-6 h-6" /></button>
-                            <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2"><Plus className="w-5 h-5" /><span>New Project</span></button>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                       {projects.map(p => <ProjectCard key={p.title} project={p} />)}
-                    </div>
-                </div>
+                <ProjectsView isSidebarCollapsed={isSidebarCollapsed} projects={projects} />
             </main>
         </div>
     );

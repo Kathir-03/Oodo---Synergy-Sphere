@@ -27,9 +27,8 @@ export default function LoginPage() {
     e.preventDefault();
     // 1. Get the CSRF token value using our helper function
     const csrfToken = getCookie('csrftoken');
-
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/auth/register/`, {
+      const response = await fetch(`${baseURL}/api/auth/login/`, {
         method: 'POST',
         // 2. IMPORTANT: Include credentials to send cookies
         credentials: 'include',
@@ -39,8 +38,8 @@ export default function LoginPage() {
           'X-CSRFToken': csrfToken,
         },
         body: JSON.stringify({
-          username: 'testuser', // Replace with form data
-          password: 'testpassword', // Replace with form data
+          email: email, // Replace with form data
+          password: password, // Replace with form data
         }),
       });
 
@@ -48,6 +47,9 @@ export default function LoginPage() {
 
       if (response.ok) {
         console.log("Login successful:", data);
+        localStorage.setItem('userData', JSON.stringify(data));
+        console.log(localStorage.getItem('userData'));
+        navigate('/dashboard'); // Redirect to dashboard on success
       } else {
         console.error("Login failed:", data);
       }
