@@ -57,7 +57,7 @@ This **MVP** provides a clean, responsive experience on desktop and mobile, focu
 5. User can view **profile** or **logout** anytime.  
 
 ---
-
+Video link: https://youtu.be/Sqb-zHGBXuA
 ## 📌 Setup Instructions  
 
 Clone the repository:  
